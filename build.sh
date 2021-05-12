@@ -13,7 +13,7 @@ function setup {
     apt-get update
     apt-get upgrade -y
     apt-get -qq install curl wget -y
-    apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) -y
+    apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804) uuid-runtime mount -y
     apt-get autoremove --purge
     apt-get clean
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -61,18 +61,12 @@ function build {
     cp -f ../openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/ && sync
     rm -rf ../openwrt && sync
     chmod +x make
-    make -d -b s905x -k 5.9.14
+    ./make -d -b s905x -k 5.9.16
     cd out/ && gzip *.img
     cp -f ../openwrt-armvirt/*.tar.gz . && sync
     export FILEPATH=$(pwd)
-    echo "List file on open amlogic-s9xxx-openwrt/openwrt-armvirt"
+    echo "List file on open amlogic-s9xxx-openwrt/out"
     ls
-}
-
-function upload {
-   mv $ROOT_DIR/upload.sh .
-   chmod +x upload.sh
-   ./upload.sh github_api_token=$token owner=kry9ton repo=openwrt-amlogic tag=${REPO_BRANCH} filename=$FILEPATH/*.img.gz
 }
 
 setup
@@ -81,5 +75,4 @@ update_install
 download
 compile
 armvirt
-build
-upload
+# build
